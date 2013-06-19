@@ -1,0 +1,107 @@
+<?php
+
+/**
+ * Implements hook_permission().
+ */
+function gsb_fpp_stock_content_permission() {
+  return array(
+    'edit stock content' => array(
+      'title' => t('Edit Stock Content'),
+    ),
+    'create stock content' => array(
+      'title' => t('Create Stock Content'),
+    ),
+    'delete stock content' => array(
+      'title' => t('Delete Stock Content'),
+    ),
+    'add stock content' => array(
+      'title' => t('Add Stock Content'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_panels_ipe_pane_links_alter().
+ */
+function gsb_fpp_stock_content_panels_ipe_pane_links_alter(&$links, $context) {
+
+  // check if the user has access to delete...
+  // at the moment the only content that we restrict is 'Stock Content'
+
+  // if the user has access to edit and delete 'Stock Content' then...
+  // nothing more to do.
+
+  $can_edit = user_access('edit stock content');
+  $can_delete = user_access('delete stock content');
+
+  if ($can_edit && $can_delete) {
+    //  We are good to go.
+    return;
+  }
+
+  if (!isset($links['delete']) && !isset($links['edit'])) {
+    return;
+  }
+
+  $pane_id = $context['pane']->pid;
+  
+  $type = $context['display']->content[$pane_id]->type;
+  $subtype = $context['display']->content[$pane_id]->subtype;
+
+  if ($type != 'fieldable_panels_pane') {
+    return;
+  }
+
+  // get the uuid of the item
+  // the subtype should look something like this... 'uuid:bf7f85ab-ebdf-4f77-9782-25bf0eda19ad'
+  list($part1, $uuid) = explode(":", $subtype);
+  
+  // get the fpp entity
+  $entity = _gsb_fpp_stock_content_get_fpp_entity_by_uuid($uuid);
+
+  // first check if we are considering a delete link
+  if (!$can_delete && isset($links['delete'])) {
+    if ($entity != null && $links['delete']['attributes']['id'] == 'pane-delete-panel-pane-' . $pane_id) {
+      if ($entity->category == 'Stock Content') {
+        unset($links['delete']);
+      }
+    }
+  }
+
+  // first check if we are considering an edit link
+  if (!$can_edit && isset($links['edit'])) {
+    if ($entity != null && $entity->category == 'Stock Content') {
+      unset($links['edit']);
+    }
+  }
+}
+
+function _gsb_fpp_stock_content_get_fpp_entity_by_uuid($uuid) {
+
+  if (empty($uuid)) {
+    return null;
+  }
+
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'fieldable_panels_pane');
+  $query->propertyCondition('uuid', $uuid);
+
+  try {
+    $result = $query->execute();
+  }
+  catch (EntityFieldQueryException $exception) {
+    //$message = $exception->getMessage();
+    return null;
+  }
+
+  if ($result == null || !isset($result['fieldable_panels_pane'])) {
+    return null;
+  }
+
+  $fpp = reset($result['fieldable_panels_pane']);
+  $fpp_entity = fieldable_panels_panes_load($fpp->fpid);
+
+  return $fpp_entity;
+
+}
+
