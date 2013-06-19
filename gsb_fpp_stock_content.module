@@ -83,7 +83,6 @@ function gsb_fpp_stock_content_panels_ipe_pane_links_alter(&$links, $context) {
  * 'reusable' categories setup on gsb_fpp_customization.
  */
 function gsb_fpp_stock_content_gsb_fpp_customization_add_category_alter(&$form, &$categories) {
-  $test = 'test';
 
   // add 'Stock Content' as a category of reusable fpps
   // but only if... the user has permission
@@ -94,6 +93,7 @@ function gsb_fpp_stock_content_gsb_fpp_customization_add_category_alter(&$form, 
       $categories['Stock Content'] = 'Stock Content';
     }
   }
+  
 }
 
 /**
