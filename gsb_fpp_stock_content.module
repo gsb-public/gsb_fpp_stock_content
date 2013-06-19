@@ -97,6 +97,31 @@ function gsb_fpp_stock_content_gsb_fpp_customization_add_category_alter(&$form, 
 }
 
 /**
+ * Implements hook_gsb_fpp_customization_remove_category_alter()
+ *
+ * This function will remove the 'Stock Content' category to the list of
+ * categories, if the user doesn't have add/create access
+ */
+function gsb_fpp_stock_content_gsb_fpp_customization_remove_category_alter(&$remove_items) {
+
+  // add 'stock content' to the list of removed categories...
+  // if the user doesn't have permission to add or create 'stock content'
+
+  // having 'create' access implies 'add'
+
+  if (user_access('create stock content')) {
+    return;
+  }
+
+  if (user_access('add stock content')) {
+    return;
+  }
+
+  $remove_items[] = 'stock-content';
+
+}
+
+/**
  * Get a FPP Entity by UUID
  */
 function _gsb_fpp_stock_content_get_fpp_entity_by_uuid($uuid) {
