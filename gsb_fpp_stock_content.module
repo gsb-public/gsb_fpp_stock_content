@@ -22,22 +22,32 @@ function gsb_fpp_stock_content_permission() {
 
 /**
  * Implements hook_panels_ipe_pane_links_alter().
+ *
+ * This hook will remove the 'gear' and/or 'trash can' buttons
+ * at the top of each pane in the panels ipe, if the user
+ * doesn't have access to take these actions for the specific
+ * content pane.
+ *
+ * Since this is the 'Stock Content' module...
+ * ... we only do this for 'Stock Content' FPPs.
+ *
  */
 function gsb_fpp_stock_content_panels_ipe_pane_links_alter(&$links, $context) {
 
   // check if the user has access to delete...
-  // at the moment the only content that we restrict is 'Stock Content'
 
   // if the user has access to edit and delete 'Stock Content' then...
-  // nothing more to do.
+  // there is nothing more to do.
 
   $can_edit = user_access('edit stock content');
   $can_delete = user_access('delete stock content');
 
   if ($can_edit && $can_delete) {
-    //  We are good to go.
     return;
   }
+
+  // if we aren't looking at 'delete' or 'edit' links then...
+  // there is nothing more to do.
 
   if (!isset($links['delete']) && !isset($links['edit'])) {
     return;
@@ -47,6 +57,9 @@ function gsb_fpp_stock_content_panels_ipe_pane_links_alter(&$links, $context) {
   
   $type = $context['display']->content[$pane_id]->type;
   $subtype = $context['display']->content[$pane_id]->subtype;
+
+  // if the pane isn't a fpp then...
+  // there is nothing more to do.
 
   if ($type != 'fieldable_panels_pane') {
     return;
@@ -68,7 +81,7 @@ function gsb_fpp_stock_content_panels_ipe_pane_links_alter(&$links, $context) {
     }
   }
 
-  // first check if we are considering an edit link
+  // next check if we are considering an edit link
   if (!$can_edit && isset($links['edit'])) {
     if ($entity != null && $entity->category == 'Stock Content') {
       unset($links['edit']);
