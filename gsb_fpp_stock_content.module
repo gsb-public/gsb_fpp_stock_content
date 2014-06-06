@@ -100,7 +100,7 @@ function gsb_fpp_stock_content_gsb_fpp_customization_add_category_alter(&$form, 
   // add 'Stock Content' as a category of reusable fpps
   // but only if... the user has permission
   // ... and the entity is one of these...
-  $stockables = array('accordion', 'cta', 'featured_person', 'house_ads', 'image_cta', 'links', 'spotlight');
+  $stockables = array('accordion', 'cta', 'featured_person', 'homepage_cta', 'house_ads', 'image_cta', 'links', 'spotlight');
   if (user_access('create stock content')) {
     if (isset($form['#entity']) && in_array($form['#entity']->bundle, $stockables)) {
       $categories['Stock Content'] = 'Stock Content';
